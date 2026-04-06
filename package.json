@@ -1,7 +1,7 @@
 {
 	"type": "module",
-    "dependencies": {
+	"dependencies": {
 		"cookie-parser": "^1.4.6",
-		"express": "^4.17.3"
+		"express": "^5.2.1"
 	}
 }
