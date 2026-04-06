@@ -1,40 +1,57 @@
-'use strict'
-
-const express = require('express')
-const cookieParser = require('cookie-parser')
+import express from 'express'
+import cookieParser from 'cookie-parser'
 
 const app = express()
 app.use(cookieParser())
 
-app.get('/api/page/:id', (req, res) => {
-    console.log('hi');
-    res.send(stringifyPayload(req))
+app.get('/api/book', (req, res) => {
+    res.send(stringifyPayload(req, res))
 })
 
-app.get('/api/page', (req, res) => {
-    console.log('hi');
-    res.send(stringifyPayload(req))
+app.get('/api/book/:bookId', (req, res) => {
+    res.send(stringifyPayload(req, res))
 })
 
-app.get('/api/toggle-cookie', (req, res) => {
-    req.cookies.aCookie ? 
-        res.clearCookie('aCookie') : 
-        res.cookie('aCookie', 'Chocolate Chip')
+app.get('/api/book/:bookId/:chapterId', (req, res) => {
+    res.send(stringifyPayload(req, res))
+})
+
+app.get('/api/set-cookie', (req, res) => {
+    const flavors = ['Chocolate Chip', 'Jam', 'Butter', 'Lemon Cream']
+    const idx = getRandomInt(flavors.length)
+
+    res.cookie('test-cookie', flavors[idx])
+    res.send(stringifyPayload(req, res))
+})
+
+app.get('/api/clear-cookie', (req, res) => {
+    res.clearCookie('test-cookie')
+    res.send(stringifyPayload(req, res))
+})
+
+app.get('/api/counter-cookie', (req, res) => {
+    let count = req.cookies.count || 0
     
-    res.send(stringifyPayload(req))
+    res.cookie('count', ++count)
+    res.send(stringifyPayload(req, res))
 })
 
-app.get('/api/:book', (req, res) => {
-    res.send(stringifyPayload(req))
+app.get('/api/expiring-cookie', (req, res) => {
+    res.cookie('expiring-cookie', 'Hi', { maxAge: 3000 })
+    res.send(stringifyPayload(req, res))
+})
+
+app.get('/api/:id', (req, res) => {
+    res.send(stringifyPayload(req, res))
 })
 
 app.get('*', (req, res) => {
-    res.send(stringifyPayload(req))
+    res.send(stringifyPayload(req, res))
 })
 
-function stringifyPayload(req){
+function stringifyPayload(req, res){
     const resStr = `
-        <pre style="margin: 20px">
+        <pre style="margin: 20px 5px">
             \nRoute: ${req.route.path}
             \nRoute Params: ${JSON.stringify(req.params, null, 4)}
             \nQuery String Params: ${JSON.stringify(req.query, null, 4)}
@@ -44,8 +61,12 @@ function stringifyPayload(req){
     return resStr
 }
 
+function getRandomInt(max) {
+    return Math.floor(Math.random() * max)
+}
+
 const port = 3001
 app.listen(port, '127.0.0.1')
 
 console.log(`Server running at http://127.0.0.1:${port}...`)
-console.log('Is there anybody out there?');
+console.log('Is there anybody out there?')
